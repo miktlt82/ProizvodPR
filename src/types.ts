@@ -1,3 +1,7 @@
+export type Language = "en" | "ru";
+
+export type LocalizedText = Record<Language, string>;
+
 export type Route =
   | "home"
   | "marketplace"
@@ -30,22 +34,22 @@ export type NftItem = {
   collection: string;
   price: string;
   network: string;
-  rarity: string;
+  rarity: LocalizedText;
   likes: number;
   type: FilterKey;
   image: string;
   owner: string;
-  description: string;
-  properties: Array<{ trait: string; value: string }>;
-  priceHistory: Array<{ label: string; value: number }>;
+  description: LocalizedText;
+  properties: Array<{ trait: LocalizedText; value: LocalizedText }>;
+  priceHistory: Array<{ label: LocalizedText; value: number }>;
 };
 
 export type WalletOption = {
   name: string;
-  label: string;
+  label: LocalizedText;
 };
 
 export type Metric = {
-  label: string;
+  label: LocalizedText;
   value: string;
 };

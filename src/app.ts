@@ -1,5 +1,6 @@
 import { collections, nftItems, stats, walletOptions } from "./data";
-import type { FilterKey, NftItem, Route } from "./types";
+import { copy } from "./i18n";
+import type { FilterKey, Language, LocalizedText, NftItem, Route } from "./types";
 
 const routeMap: Record<string, Route> = {
   "": "home",
@@ -15,10 +16,26 @@ const routeMap: Record<string, Route> = {
   "#/design": "design",
 };
 
+const storageKey = "nexora-language";
+
 type AppState = {
   filter: FilterKey;
   favorites: Set<string>;
+  language: Language;
 };
+
+function localize(value: LocalizedText, language: Language): string {
+  return value[language];
+}
+
+function getInitialLanguage(): Language {
+  const savedLanguage = window.localStorage.getItem(storageKey);
+  if (savedLanguage === "en" || savedLanguage === "ru") {
+    return savedLanguage;
+  }
+
+  return window.navigator.language.toLowerCase().startsWith("ru") ? "ru" : "en";
+}
 
 function getRoute(): { page: Route; nftId: string } {
   const hash = window.location.hash || "#/";
@@ -37,12 +54,12 @@ function navLink(route: Route, label: string): string {
   return `<a class="${active}" href="${href}">${label}</a>`;
 }
 
-function metricCards(): string {
+function metricCards(language: Language): string {
   return stats
     .map(
       (item) => `
         <article class="metric-card">
-          <p>${item.label}</p>
+          <p>${localize(item.label, language)}</p>
           <h3>${item.value}</h3>
         </article>
       `,
@@ -50,11 +67,12 @@ function metricCards(): string {
     .join("");
 }
 
-function collectionCard(item: (typeof collections)[number]): string {
+function collectionCard(item: (typeof collections)[number], language: Language): string {
+  const ui = copy[language];
   return `
     <article class="collection-card ${item.theme}">
       <div class="collection-cover">
-        <span class="collection-badge">Curated</span>
+        <span class="collection-badge">${ui.curated}</span>
       </div>
       <div class="collection-body">
         <div class="card-row">
@@ -65,29 +83,31 @@ function collectionCard(item: (typeof collections)[number]): string {
           <span class="trend">${item.change}</span>
         </div>
         <div class="collection-stats">
-          <span><strong>${item.floor}</strong> Floor</span>
-          <span><strong>${item.volume}</strong> Volume</span>
-          <span><strong>${item.items}</strong> Items</span>
+          <span><strong>${item.floor}</strong> ${ui.floor}</span>
+          <span><strong>${item.volume}</strong> ${ui.volume}</span>
+          <span><strong>${item.items}</strong> ${ui.items}</span>
         </div>
       </div>
     </article>
   `;
 }
 
-function collectionCards(): string {
-  return collections.map((item) => collectionCard(item)).join("");
+function collectionCards(language: Language): string {
+  return collections.map((item) => collectionCard(item, language)).join("");
 }
 
 function nftCard(item: NftItem, state: AppState): string {
   const favorite = state.favorites.has(item.id) ? "is-active" : "";
+  const ui = copy[state.language];
+
   return `
     <article class="nft-card">
-      <button class="favorite-button ${favorite}" data-favorite="${item.id}" aria-label="Toggle favorite">
+      <button class="favorite-button ${favorite}" data-favorite="${item.id}" aria-label="${ui.toggleFavorite}">
         <span>+</span>
       </button>
       <a class="card-media" href="#/nft?id=${item.id}" style="background:${item.image}">
         <span class="media-orbit"></span>
-        <span class="media-chip">${item.rarity}</span>
+        <span class="media-chip">${localize(item.rarity, state.language)}</span>
       </a>
       <div class="card-content">
         <div class="card-row">
@@ -107,39 +127,38 @@ function nftCard(item: NftItem, state: AppState): string {
 }
 
 function homePage(state: AppState): string {
+  const ui = copy[state.language];
+
   return `
     <section class="hero">
       <div class="hero-copy">
-        <span class="section-chip">Curated Web3 marketplace</span>
-        <h1>Collect digital assets in a space built to feel premium, clear and alive.</h1>
-        <p>
-          Nexora is a concept NFT marketplace for exploring curated collections, tracking
-          market signals and listing digital art with a wallet-first flow.
-        </p>
+        <span class="section-chip">${ui.home.chip}</span>
+        <h1>${ui.home.title}</h1>
+        <p>${ui.home.description}</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#/marketplace">Explore marketplace</a>
-          <a class="button button-secondary" href="#/wallet">Connect wallet</a>
+          <a class="button button-primary" href="#/marketplace">${ui.home.exploreMarketplace}</a>
+          <a class="button button-secondary" href="#/wallet">${ui.connectWallet}</a>
         </div>
-        <div class="hero-metrics">${metricCards()}</div>
+        <div class="hero-metrics">${metricCards(state.language)}</div>
       </div>
       <div class="hero-panel">
         <article class="spotlight-card">
           <div class="spotlight-visual" style="background:${nftItems[0].image}">
             <span class="visual-ring"></span>
-            <span class="visual-tag">Featured drop</span>
+            <span class="visual-tag">${ui.home.featuredDrop}</span>
           </div>
           <div class="spotlight-content">
             <div class="card-row">
               <div>
-                <p class="eyebrow">Today spotlight</p>
+                <p class="eyebrow">${ui.home.todaySpotlight}</p>
                 <h2>${nftItems[0].name}</h2>
               </div>
               <span class="price-badge">${nftItems[0].price}</span>
             </div>
-            <p>${nftItems[0].description}</p>
+            <p>${localize(nftItems[0].description, state.language)}</p>
             <div class="spotlight-footer">
-              <span>Creator ${nftItems[0].creator}</span>
-              <a href="#/nft?id=${nftItems[0].id}">View token</a>
+              <span>${ui.home.creator} ${nftItems[0].creator}</span>
+              <a href="#/nft?id=${nftItems[0].id}">${ui.home.viewToken}</a>
             </div>
           </div>
         </article>
@@ -149,107 +168,108 @@ function homePage(state: AppState): string {
     <section class="section-grid">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Trending collections</p>
-          <h2>Signal-rich collections with visible momentum</h2>
+          <p class="eyebrow">${ui.home.trendingCollections}</p>
+          <h2>${ui.home.trendingCollectionsTitle}</h2>
         </div>
-        <a class="text-link" href="#/collections">View all collections</a>
+        <a class="text-link" href="#/collections">${ui.home.viewAllCollections}</a>
       </div>
-      <div class="collection-grid">${collectionCards()}</div>
+      <div class="collection-grid">${collectionCards(state.language)}</div>
     </section>
 
     <section class="section-grid">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Popular NFT</p>
-          <h2>High-demand assets surfaced with a clean browsing flow</h2>
+          <p class="eyebrow">${ui.home.popularNft}</p>
+          <h2>${ui.home.popularNftTitle}</h2>
         </div>
-        <a class="text-link" href="#/marketplace">Browse catalog</a>
+        <a class="text-link" href="#/marketplace">${ui.home.browseCatalog}</a>
       </div>
       <div class="nft-grid">${nftItems.slice(0, 4).map((item) => nftCard(item, state)).join("")}</div>
     </section>
 
     <section class="feature-band">
-      <article>
-        <span class="feature-index">01</span>
-        <h3>Wallet-first onboarding</h3>
-        <p>Fast entry point with minimal friction for users who want to explore before acting.</p>
-      </article>
-      <article>
-        <span class="feature-index">02</span>
-        <h3>Readable token pages</h3>
-        <p>Price, rarity, owner data and activity are grouped into a single clear decision layer.</p>
-      </article>
-      <article>
-        <span class="feature-index">03</span>
-        <h3>Curated visual system</h3>
-        <p>Dark luxury art direction keeps focus on NFT content instead of UI clutter.</p>
-      </article>
+      ${ui.home.features
+        .map(
+          (feature, index) => `
+            <article>
+              <span class="feature-index">${String(index + 1).padStart(2, "0")}</span>
+              <h3>${feature.title}</h3>
+              <p>${feature.description}</p>
+            </article>
+          `,
+        )
+        .join("")}
     </section>
 
     <section class="steps-section">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">How it starts</p>
-          <h2>Three steps from discovery to ownership</h2>
+          <p class="eyebrow">${ui.home.howItStarts}</p>
+          <h2>${ui.home.stepsTitle}</h2>
         </div>
       </div>
       <div class="steps-grid">
-        <article><span>1</span><h3>Connect wallet</h3><p>Choose a wallet and unlock access to favorites, profile and transactions.</p></article>
-        <article><span>2</span><h3>Explore assets</h3><p>Use filters, collection rankings and token pages to compare opportunities.</p></article>
-        <article><span>3</span><h3>Buy or list</h3><p>Complete a purchase or create a polished listing in a guided creator flow.</p></article>
+        ${ui.home.steps
+          .map(
+            (step, index) => `
+              <article><span>${index + 1}</span><h3>${step.title}</h3><p>${step.description}</p></article>
+            `,
+          )
+          .join("")}
       </div>
     </section>
 
     <section class="cta-panel">
       <div>
-        <p class="eyebrow">Start your digital vault</p>
-        <h2>Build a collection interface that feels as premium as the assets inside it.</h2>
+        <p class="eyebrow">${ui.home.startVault}</p>
+        <h2>${ui.home.startVaultTitle}</h2>
       </div>
       <div class="hero-actions">
-        <a class="button button-primary" href="#/wallet">Connect wallet</a>
-        <a class="button button-secondary" href="#/create">Create listing</a>
+        <a class="button button-primary" href="#/wallet">${ui.connectWallet}</a>
+        <a class="button button-secondary" href="#/create">${ui.home.createListing}</a>
       </div>
     </section>
   `;
 }
 
 function marketplacePage(state: AppState): string {
+  const ui = copy[state.language];
   const visible = state.filter === "all" ? nftItems : nftItems.filter((item) => item.type === state.filter);
 
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Marketplace</p>
-        <h1>Browse premium NFT inventory</h1>
+        <p class="eyebrow">${ui.marketplace.eyebrow}</p>
+        <h1>${ui.marketplace.title}</h1>
       </div>
-      <a class="button button-secondary" href="#/favorites">Open favorites</a>
+      <a class="button button-secondary" href="#/favorites">${ui.marketplace.openFavorites}</a>
     </section>
 
     <section class="catalog-layout">
       <aside class="sidebar">
-        <h3>Filters</h3>
-        <button class="filter-chip ${state.filter === "all" ? "active" : ""}" data-filter="all">All assets</button>
-        <button class="filter-chip ${state.filter === "art" ? "active" : ""}" data-filter="art">Digital art</button>
-        <button class="filter-chip ${state.filter === "music" ? "active" : ""}" data-filter="music">Music NFT</button>
-        <button class="filter-chip ${state.filter === "gaming" ? "active" : ""}" data-filter="gaming">Gaming</button>
-        <button class="filter-chip ${state.filter === "fashion" ? "active" : ""}" data-filter="fashion">Fashion</button>
+        <h3>${ui.marketplace.filters}</h3>
+        <button class="filter-chip ${state.filter === "all" ? "active" : ""}" data-filter="all">${ui.marketplace.allAssets}</button>
+        <button class="filter-chip ${state.filter === "art" ? "active" : ""}" data-filter="art">${ui.marketplace.digitalArt}</button>
+        <button class="filter-chip ${state.filter === "music" ? "active" : ""}" data-filter="music">${ui.marketplace.musicNft}</button>
+        <button class="filter-chip ${state.filter === "gaming" ? "active" : ""}" data-filter="gaming">${ui.marketplace.gaming}</button>
+        <button class="filter-chip ${state.filter === "fashion" ? "active" : ""}" data-filter="fashion">${ui.marketplace.fashion}</button>
 
         <div class="sidebar-group">
-          <p class="sidebar-label">Price range</p>
+          <p class="sidebar-label">${ui.marketplace.priceRange}</p>
           <div class="range-line"></div>
           <div class="card-row card-meta"><span>0.1 ETH</span><span>3.0 ETH</span></div>
         </div>
 
         <div class="sidebar-group">
-          <p class="sidebar-label">Networks</p>
+          <p class="sidebar-label">${ui.marketplace.networks}</p>
           <div class="mini-tags"><span>Ethereum</span><span>Base</span><span>Polygon</span></div>
         </div>
       </aside>
 
       <div class="catalog-main">
         <div class="catalog-toolbar">
-          <div class="search-shell"><span>Search collections, creators, token IDs</span></div>
-          <div class="mini-tags"><span>Trending first</span><span>Verified</span></div>
+          <div class="search-shell"><span>${ui.marketplace.searchPlaceholder}</span></div>
+          <div class="mini-tags"><span>${ui.marketplace.trendingFirst}</span><span>${ui.marketplace.verified}</span></div>
         </div>
         <div class="nft-grid">${visible.map((item) => nftCard(item, state)).join("")}</div>
       </div>
@@ -258,6 +278,7 @@ function marketplacePage(state: AppState): string {
 }
 
 function nftPage(id: string, state: AppState): string {
+  const ui = copy[state.language];
   const item = nftItems.find((entry) => entry.id === id) ?? nftItems[0];
   const favorite = state.favorites.has(item.id) ? "is-active" : "";
   const maxValue = Math.max(...item.priceHistory.map((entry) => entry.value));
@@ -275,30 +296,30 @@ function nftPage(id: string, state: AppState): string {
             <p class="eyebrow">${item.collection}</p>
             <h1>${item.name}</h1>
           </div>
-          <button class="favorite-button ${favorite}" data-favorite="${item.id}" aria-label="Toggle favorite">
+          <button class="favorite-button ${favorite}" data-favorite="${item.id}" aria-label="${ui.toggleFavorite}">
             <span>+</span>
           </button>
         </div>
 
-        <p class="detail-description">${item.description}</p>
+        <p class="detail-description">${localize(item.description, state.language)}</p>
 
         <div class="detail-info-grid">
-          <article class="info-tile"><span>Current price</span><strong>${item.price}</strong></article>
-          <article class="info-tile"><span>Owner</span><strong>${item.owner}</strong></article>
-          <article class="info-tile"><span>Rarity</span><strong>${item.rarity}</strong></article>
-          <article class="info-tile"><span>Creator</span><strong>${item.creator}</strong></article>
+          <article class="info-tile"><span>${ui.nft.currentPrice}</span><strong>${item.price}</strong></article>
+          <article class="info-tile"><span>${ui.nft.owner}</span><strong>${item.owner}</strong></article>
+          <article class="info-tile"><span>${ui.nft.rarity}</span><strong>${localize(item.rarity, state.language)}</strong></article>
+          <article class="info-tile"><span>${ui.nft.creator}</span><strong>${item.creator}</strong></article>
         </div>
 
         <div class="detail-actions">
-          <button class="button button-primary">Buy now</button>
-          <button class="button button-secondary">Make offer</button>
+          <button class="button button-primary">${ui.nft.buyNow}</button>
+          <button class="button button-secondary">${ui.nft.makeOffer}</button>
         </div>
 
         <section class="panel-block">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Properties</p>
-              <h2>Trait breakdown</h2>
+              <p class="eyebrow">${ui.nft.properties}</p>
+              <h2>${ui.nft.traitBreakdown}</h2>
             </div>
           </div>
           <div class="property-grid">
@@ -306,8 +327,8 @@ function nftPage(id: string, state: AppState): string {
               .map(
                 (property) => `
                   <article class="property-card">
-                    <span>${property.trait}</span>
-                    <strong>${property.value}</strong>
+                    <span>${localize(property.trait, state.language)}</span>
+                    <strong>${localize(property.value, state.language)}</strong>
                   </article>
                 `,
               )
@@ -318,8 +339,8 @@ function nftPage(id: string, state: AppState): string {
         <section class="panel-block">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Price history</p>
-              <h2>Value progression</h2>
+              <p class="eyebrow">${ui.nft.priceHistory}</p>
+              <h2>${ui.nft.valueProgression}</h2>
             </div>
           </div>
           <div class="chart">
@@ -329,7 +350,7 @@ function nftPage(id: string, state: AppState): string {
                 return `
                   <div class="chart-bar">
                     <div class="chart-fill" style="height:${height}"></div>
-                    <span>${point.label}</span>
+                    <span>${localize(point.label, state.language)}</span>
                   </div>
                 `;
               })
@@ -340,14 +361,14 @@ function nftPage(id: string, state: AppState): string {
         <section class="panel-block">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Activity</p>
-              <h2>Recent market actions</h2>
+              <p class="eyebrow">${ui.nft.activity}</p>
+              <h2>${ui.nft.recentMarketActions}</h2>
             </div>
           </div>
           <div class="activity-list">
-            <article><strong>Listed</strong><span>2 hours ago</span><span>${item.price}</span></article>
-            <article><strong>Offer placed</strong><span>Yesterday</span><span>1.48 ETH</span></article>
-            <article><strong>Transferred</strong><span>Apr 09</span><span>Wallet to wallet</span></article>
+            <article><strong>${ui.nft.listed}</strong><span>${ui.nft.hoursAgo2}</span><span>${item.price}</span></article>
+            <article><strong>${ui.nft.offerPlaced}</strong><span>${ui.nft.yesterday}</span><span>1.48 ETH</span></article>
+            <article><strong>${ui.nft.transferred}</strong><span>${ui.nft.apr09}</span><span>${ui.nft.walletToWallet}</span></article>
           </div>
         </section>
       </article>
@@ -355,23 +376,25 @@ function nftPage(id: string, state: AppState): string {
   `;
 }
 
-function collectionsPage(): string {
+function collectionsPage(language: Language): string {
+  const ui = copy[language];
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Collections</p>
-        <h1>Track curated ecosystems and market momentum</h1>
+        <p class="eyebrow">${ui.collections.eyebrow}</p>
+        <h1>${ui.collections.title}</h1>
       </div>
     </section>
 
-    <div class="collection-grid">${collectionCards()}</div>
+    <div class="collection-grid">${collectionCards(language)}</div>
 
     <section class="ranking-table">
       <div class="table-head">
-        <span>Collection</span>
-        <span>Floor</span>
-        <span>Volume</span>
-        <span>24h</span>
+        <span>${ui.collections.collection}</span>
+        <span>${ui.collections.floor}</span>
+        <span>${ui.collections.volume}</span>
+        <span>${ui.collections.day24h}</span>
       </div>
       ${collections
         .map(
@@ -390,31 +413,33 @@ function collectionsPage(): string {
 }
 
 function profilePage(state: AppState): string {
+  const ui = copy[state.language];
+
   return `
     <section class="profile-hero">
       <div class="profile-avatar">N</div>
       <div class="profile-copy">
-        <p class="eyebrow">Collector profile</p>
-        <h1>Nexora Vault</h1>
+        <p class="eyebrow">${ui.profile.eyebrow}</p>
+        <h1>${ui.profile.title}</h1>
         <p>0x71C2...44EF</p>
       </div>
       <div class="profile-actions">
-        <a class="button button-secondary" href="#/create">Create listing</a>
+        <a class="button button-secondary" href="#/create">${ui.profile.createListing}</a>
       </div>
     </section>
 
     <section class="profile-stats">
-      <article><span>Owned</span><strong>16</strong></article>
-      <article><span>On sale</span><strong>5</strong></article>
-      <article><span>Total value</span><strong>18.4 ETH</strong></article>
-      <article><span>Activity</span><strong>42 actions</strong></article>
+      <article><span>${ui.profile.owned}</span><strong>16</strong></article>
+      <article><span>${ui.profile.onSale}</span><strong>5</strong></article>
+      <article><span>${ui.profile.totalValue}</span><strong>18.4 ETH</strong></article>
+      <article><span>${ui.profile.activity}</span><strong>42 actions</strong></article>
     </section>
 
     <section class="section-grid">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Owned assets</p>
-          <h2>Portfolio overview</h2>
+          <p class="eyebrow">${ui.profile.ownedAssets}</p>
+          <h2>${ui.profile.portfolioOverview}</h2>
         </div>
       </div>
       <div class="nft-grid">${nftItems.slice(0, 3).map((item) => nftCard(item, state)).join("")}</div>
@@ -423,60 +448,64 @@ function profilePage(state: AppState): string {
     <section class="panel-block">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Recent activity</p>
-          <h2>Wallet timeline</h2>
+          <p class="eyebrow">${ui.profile.recentActivity}</p>
+          <h2>${ui.profile.walletTimeline}</h2>
         </div>
       </div>
       <div class="activity-list">
-        <article><strong>Bought Prism Archive #01</strong><span>Today</span><span>1.62 ETH</span></article>
-        <article><strong>Listed Neon Driver #88</strong><span>Yesterday</span><span>0.94 ETH</span></article>
-        <article><strong>Added Bloom Frequency to favorites</strong><span>Apr 14</span><span>Saved</span></article>
+        <article><strong>${ui.profile.bought}</strong><span>${ui.profile.today}</span><span>1.62 ETH</span></article>
+        <article><strong>${ui.profile.listed}</strong><span>${ui.profile.yesterday}</span><span>0.94 ETH</span></article>
+        <article><strong>${ui.profile.addedToFavorites}</strong><span>${ui.profile.apr14}</span><span>${ui.profile.saved}</span></article>
       </div>
     </section>
   `;
 }
 
 function createPage(state: AppState): string {
+  const ui = copy[state.language];
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Create listing</p>
-        <h1>Prepare an NFT listing with a polished creator flow</h1>
+        <p class="eyebrow">${ui.create.eyebrow}</p>
+        <h1>${ui.create.title}</h1>
       </div>
     </section>
 
     <section class="create-layout">
       <article class="form-panel">
         <div class="field-grid">
-          <label class="field"><span>Artwork title</span><div class="input-shell">Enter title</div></label>
-          <label class="field"><span>Collection</span><div class="input-shell">Choose collection</div></label>
+          <label class="field"><span>${ui.create.artworkTitle}</span><div class="input-shell">${ui.create.enterTitle}</div></label>
+          <label class="field"><span>${ui.create.collection}</span><div class="input-shell">${ui.create.chooseCollection}</div></label>
           <label class="field field-full">
-            <span>Description</span>
-            <div class="input-shell input-tall">Describe the concept, rarity and artistic value</div>
+            <span>${ui.create.description}</span>
+            <div class="input-shell input-tall">${ui.create.descriptionPlaceholder}</div>
           </label>
-          <label class="field"><span>Price</span><div class="input-shell">0.00 ETH</div></label>
-          <label class="field"><span>Network</span><div class="input-shell">Ethereum</div></label>
+          <label class="field"><span>${ui.create.price}</span><div class="input-shell">0.00 ETH</div></label>
+          <label class="field"><span>${ui.create.network}</span><div class="input-shell">Ethereum</div></label>
         </div>
         <div class="detail-actions">
-          <button class="button button-primary">Publish listing</button>
-          <button class="button button-secondary">Save draft</button>
+          <button class="button button-primary">${ui.create.publishListing}</button>
+          <button class="button button-secondary">${ui.create.saveDraft}</button>
         </div>
       </article>
 
       <article class="preview-panel">
-        <p class="eyebrow">Live preview</p>
+        <p class="eyebrow">${ui.create.livePreview}</p>
         ${nftCard(nftItems[0], state)}
       </article>
     </section>
   `;
 }
 
-function walletPage(): string {
+function walletPage(language: Language): string {
+  const ui = copy[language];
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Wallet access</p>
-        <h1>Connect a wallet to unlock your Web3 profile</h1>
+        <p class="eyebrow">${ui.wallet.eyebrow}</p>
+        <h1>${ui.wallet.title}</h1>
       </div>
     </section>
 
@@ -488,9 +517,9 @@ function walletPage(): string {
               <div class="wallet-mark">${wallet.name.slice(0, 1)}</div>
               <div>
                 <h3>${wallet.name}</h3>
-                <p>${wallet.label}</p>
+                <p>${localize(wallet.label, language)}</p>
               </div>
-              <button class="button button-secondary">Connect</button>
+              <button class="button button-secondary">${ui.wallet.connect}</button>
             </article>
           `,
         )
@@ -500,121 +529,125 @@ function walletPage(): string {
     <section class="panel-block">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Why connect</p>
-          <h2>Wallet-gated actions</h2>
+          <p class="eyebrow">${ui.wallet.whyConnect}</p>
+          <h2>${ui.wallet.walletGatedActions}</h2>
         </div>
       </div>
       <div class="steps-grid">
-        <article><span>1</span><h3>Buy tokens</h3><p>Required to confirm on-chain purchases and offers.</p></article>
-        <article><span>2</span><h3>Manage profile</h3><p>Display owned assets, saved items and transaction history.</p></article>
-        <article><span>3</span><h3>List NFT</h3><p>Publish assets in a marketplace-ready layout.</p></article>
+        ${ui.wallet.steps
+          .map(
+            (step, index) => `
+              <article><span>${index + 1}</span><h3>${step.title}</h3><p>${step.description}</p></article>
+            `,
+          )
+          .join("")}
       </div>
     </section>
   `;
 }
 
 function favoritesPage(state: AppState): string {
+  const ui = copy[state.language];
   const favorites = nftItems.filter((item) => state.favorites.has(item.id));
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Favorites</p>
-        <h1>Saved NFT for quick return and comparison</h1>
+        <p class="eyebrow">${ui.favorites.eyebrow}</p>
+        <h1>${ui.favorites.title}</h1>
       </div>
     </section>
     <div class="nft-grid">${favorites.map((item) => nftCard(item, state)).join("")}</div>
   `;
 }
 
-function helpPage(): string {
+function helpPage(language: Language): string {
+  const ui = copy[language];
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">FAQ and help</p>
-        <h1>Core onboarding answers for a Web3 marketplace</h1>
+        <p class="eyebrow">${ui.help.eyebrow}</p>
+        <h1>${ui.help.title}</h1>
       </div>
     </section>
 
     <section class="faq-list">
-      <article>
-        <h3>How do I start using the platform?</h3>
-        <p>Open the wallet page, choose a wallet provider, connect your account and then browse the marketplace.</p>
-      </article>
-      <article>
-        <h3>What can I see before connecting a wallet?</h3>
-        <p>You can explore collections, open NFT pages, compare prices and review market metrics without authentication.</p>
-      </article>
-      <article>
-        <h3>How does listing work in this prototype?</h3>
-        <p>The creator flow focuses on UX: title, description, collection, price and preview blocks are organized for clarity.</p>
-      </article>
-      <article>
-        <h3>Why is the interface dark?</h3>
-        <p>Dark premium UI helps media assets stand out, reduces visual noise and supports the digital luxury positioning.</p>
-      </article>
+      ${ui.help.questions
+        .map(
+          (question) => `
+            <article>
+              <h3>${question.title}</h3>
+              <p>${question.description}</p>
+            </article>
+          `,
+        )
+        .join("")}
     </section>
   `;
 }
 
 function designPage(state: AppState): string {
+  const ui = copy[state.language];
+
   return `
     <section class="page-header">
       <div>
-        <p class="eyebrow">Figma kit</p>
-        <h1>Design board for transferring the prototype into Figma</h1>
+        <p class="eyebrow">${ui.design.eyebrow}</p>
+        <h1>${ui.design.title}</h1>
       </div>
-      <a class="button button-secondary" href="#/">Back to product</a>
+      <a class="button button-secondary" href="#/">${ui.design.backToProduct}</a>
     </section>
 
     <section class="design-board">
       <article class="design-panel design-cover">
         <div>
-          <p class="eyebrow">Cover frame</p>
-          <h2>Nexora UI Kit</h2>
-          <p>Premium NFT marketplace system with desktop, tablet and mobile frames.</p>
+          <p class="eyebrow">${ui.design.coverFrame}</p>
+          <h2>${ui.design.kitTitle}</h2>
+          <p>${ui.design.kitDescription}</p>
         </div>
-        <img src="/figma/logo-wordmark.svg" alt="Nexora wordmark" />
+        <img src="/figma/logo-wordmark.svg" alt="${ui.design.wordmarkAlt}" />
       </article>
 
       <article class="design-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Color styles</p>
-            <h2>Core tokens</h2>
+            <p class="eyebrow">${ui.design.colorStyles}</p>
+            <h2>${ui.design.coreTokens}</h2>
           </div>
         </div>
         <div class="token-grid">
-          <div class="token-card"><span style="background:#0A0B10"></span><strong>Background</strong><p>#0A0B10</p></div>
-          <div class="token-card"><span style="background:#12141B"></span><strong>Surface</strong><p>#12141B</p></div>
-          <div class="token-card"><span style="background:#7C5CFF"></span><strong>Accent</strong><p>#7C5CFF</p></div>
-          <div class="token-card"><span style="background:#2FD6FF"></span><strong>Hover / Active</strong><p>#2FD6FF</p></div>
-          <div class="token-card"><span style="background:#F5F7FF"></span><strong>Primary text</strong><p>#F5F7FF</p></div>
-          <div class="token-card"><span style="background:#9AA3B2"></span><strong>Secondary text</strong><p>#9AA3B2</p></div>
+          <div class="token-card"><span style="background:#0A0B10"></span><strong>${ui.design.tokens.background}</strong><p>#0A0B10</p></div>
+          <div class="token-card"><span style="background:#12141B"></span><strong>${ui.design.tokens.surface}</strong><p>#12141B</p></div>
+          <div class="token-card"><span style="background:#7C5CFF"></span><strong>${ui.design.tokens.accent}</strong><p>#7C5CFF</p></div>
+          <div class="token-card"><span style="background:#2FD6FF"></span><strong>${ui.design.tokens.hover}</strong><p>#2FD6FF</p></div>
+          <div class="token-card"><span style="background:#F5F7FF"></span><strong>${ui.design.tokens.primaryText}</strong><p>#F5F7FF</p></div>
+          <div class="token-card"><span style="background:#9AA3B2"></span><strong>${ui.design.tokens.secondaryText}</strong><p>#9AA3B2</p></div>
         </div>
       </article>
 
       <article class="design-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Typography</p>
-            <h2>Text styles</h2>
+            <p class="eyebrow">${ui.design.typography}</p>
+            <h2>${ui.design.textStyles}</h2>
           </div>
         </div>
         <div class="type-grid">
           <div class="type-card">
-            <span>Display / Space Grotesk / 72 / Semibold</span>
-            <h1>Collect Digital Culture</h1>
+            <span>${ui.design.type.display}</span>
+            <h1>${ui.design.type.displayTitle}</h1>
           </div>
           <div class="type-card">
-            <span>Heading / Space Grotesk / 40 / Medium</span>
-            <h2>Trending collections with visible momentum</h2>
+            <span>${ui.design.type.heading}</span>
+            <h2>${ui.design.type.headingTitle}</h2>
           </div>
           <div class="type-card">
-            <span>Body / Manrope / 16 / Regular</span>
-            <p>Readable product copy designed for long sections, token descriptions and instructional text.</p>
+            <span>${ui.design.type.body}</span>
+            <p>${ui.design.type.bodyText}</p>
           </div>
           <div class="type-card">
-            <span>Data / JetBrains Mono / 14 / Medium</span>
+            <span>${ui.design.type.data}</span>
             <code>1.62 ETH / 0x71C2...44EF / 24H +18.4%</code>
           </div>
         </div>
@@ -623,33 +656,33 @@ function designPage(state: AppState): string {
       <article class="design-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Components</p>
-            <h2>Main UI set</h2>
+            <p class="eyebrow">${ui.design.components}</p>
+            <h2>${ui.design.mainUiSet}</h2>
           </div>
         </div>
         <div class="component-grid">
           <div class="component-card">
-            <p>Buttons</p>
+            <p>${ui.design.buttons}</p>
             <div class="hero-actions">
-              <button class="button button-primary">Primary action</button>
-              <button class="button button-secondary">Secondary</button>
+              <button class="button button-primary">${ui.design.primaryAction}</button>
+              <button class="button button-secondary">${ui.design.secondary}</button>
             </div>
           </div>
           <div class="component-card">
-            <p>Status and tags</p>
+            <p>${ui.design.statusAndTags}</p>
             <div class="mini-tags">
-              <span>Verified</span>
-              <span>Trending</span>
+              <span>${ui.marketplace.verified}</span>
+              <span>${ui.marketplace.trendingFirst}</span>
               <span>Ethereum</span>
             </div>
           </div>
           <div class="component-card">
-            <p>NFT card</p>
+            <p>${ui.design.nftCard}</p>
             ${nftCard(nftItems[0], state)}
           </div>
           <div class="component-card">
-            <p>Collection card</p>
-            ${collectionCard(collections[0])}
+            <p>${ui.design.collectionCard}</p>
+            ${collectionCard(collections[0], state.language)}
           </div>
         </div>
       </article>
@@ -657,37 +690,32 @@ function designPage(state: AppState): string {
       <article class="design-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Frame map</p>
-            <h2>Mandatory Figma screens</h2>
+            <p class="eyebrow">${ui.design.frameMap}</p>
+            <h2>${ui.design.mandatoryScreens}</h2>
           </div>
         </div>
         <div class="frame-grid">
-          <div class="frame-card"><strong>01 Cover</strong><p>Project identity, logo, subtitle, palette preview.</p></div>
-          <div class="frame-card"><strong>02 Design System</strong><p>Colors, type, grids, spacing, buttons, cards, tags.</p></div>
-          <div class="frame-card"><strong>03 Home Desktop</strong><p>Hero, trending collections, popular NFT, CTA, footer.</p></div>
-          <div class="frame-card"><strong>04 Marketplace Desktop</strong><p>Sidebar filters, toolbar, NFT grid.</p></div>
-          <div class="frame-card"><strong>05 NFT Detail Desktop</strong><p>Media preview, pricing, properties, history, actions.</p></div>
-          <div class="frame-card"><strong>06 Collections</strong><p>Collection cards and ranking table.</p></div>
-          <div class="frame-card"><strong>07 Profile</strong><p>Portfolio stats, owned assets, activity.</p></div>
-          <div class="frame-card"><strong>08 Create Listing</strong><p>Form layout plus live preview.</p></div>
-          <div class="frame-card"><strong>09 Wallet Modal / Page</strong><p>Wallet provider choice and explanatory blocks.</p></div>
-          <div class="frame-card"><strong>10 Favorites + FAQ</strong><p>Saved assets and onboarding help states.</p></div>
-          <div class="frame-card"><strong>11 Tablet</strong><p>Home and marketplace rearranged to 8-column grid.</p></div>
-          <div class="frame-card"><strong>12 Mobile</strong><p>Home, NFT detail, profile and connect wallet.</p></div>
+          ${ui.design.frames
+            .map(
+              (frame) => `
+                <div class="frame-card"><strong>${frame.title}</strong><p>${frame.description}</p></div>
+              `,
+            )
+            .join("")}
         </div>
       </article>
 
       <article class="design-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Assets</p>
-            <h2>SVG files for import</h2>
+            <p class="eyebrow">${ui.design.assets}</p>
+            <h2>${ui.design.svgForImport}</h2>
           </div>
         </div>
         <div class="asset-grid">
-          <img src="/figma/logo-mark.svg" alt="Logo mark" />
-          <img src="/figma/hero-art.svg" alt="Hero art" />
-          <img src="/figma/empty-favorites.svg" alt="Empty state" />
+          <img src="/figma/logo-mark.svg" alt="${ui.design.logoMarkAlt}" />
+          <img src="/figma/hero-art.svg" alt="${ui.design.heroArtAlt}" />
+          <img src="/figma/empty-favorites.svg" alt="${ui.design.emptyStateAlt}" />
         </div>
       </article>
     </section>
@@ -705,7 +733,7 @@ function pageContent(route: Route, nftId: string, state: AppState): string {
     return nftPage(nftId, state);
   }
   if (route === "collections") {
-    return collectionsPage();
+    return collectionsPage(state.language);
   }
   if (route === "profile") {
     return profilePage(state);
@@ -714,13 +742,13 @@ function pageContent(route: Route, nftId: string, state: AppState): string {
     return createPage(state);
   }
   if (route === "wallet") {
-    return walletPage();
+    return walletPage(state.language);
   }
   if (route === "favorites") {
     return favoritesPage(state);
   }
   if (route === "help") {
-    return helpPage();
+    return helpPage(state.language);
   }
   if (route === "design") {
     return designPage(state);
@@ -732,41 +760,56 @@ export function createApp(root: HTMLDivElement): void {
   const state: AppState = {
     filter: "all",
     favorites: new Set<string>(["nxr-001", "nxr-003"]),
+    language: getInitialLanguage(),
   };
 
   const render = (): void => {
     const { page, nftId } = getRoute();
+    const ui = copy[state.language];
+    document.documentElement.lang = state.language;
+
     root.innerHTML = `
       <div class="shell">
         <div class="bg-orb bg-orb-left"></div>
         <div class="bg-orb bg-orb-right"></div>
         <header class="topbar">
           <a class="brand" href="#/">
-            <span class="brand-mark">N</span>
-            <div><strong>Nexora</strong><span>Premium NFT marketplace</span></div>
+            <span class="brand-mark">
+              <img src="/branding/nexora-logo.png" alt="Nexora logo" />
+            </span>
+            <div><strong>Nexora</strong><span>${ui.brandTagline}</span></div>
           </a>
           <nav class="nav">
-            ${navLink("home", "Home")}
-            ${navLink("marketplace", "Marketplace")}
-            ${navLink("collections", "Collections")}
-            ${navLink("profile", "Profile")}
-            ${navLink("create", "Create")}
-            ${navLink("help", "Help")}
-            ${navLink("design", "Figma Kit")}
+            ${navLink("home", ui.nav.home)}
+            ${navLink("marketplace", ui.nav.marketplace)}
+            ${navLink("collections", ui.nav.collections)}
+            ${navLink("profile", ui.nav.profile)}
+            ${navLink("create", ui.nav.create)}
+            ${navLink("help", ui.nav.help)}
+            ${navLink("design", ui.nav.design)}
           </nav>
-          <a class="button button-primary topbar-button" href="#/wallet">Connect Wallet</a>
+          <div class="topbar-actions">
+            <div class="language-switcher" aria-label="${ui.languageSwitcher}">
+              <button class="language-button ${state.language === "en" ? "is-active" : ""}" data-language="en">EN</button>
+              <button class="language-button ${state.language === "ru" ? "is-active" : ""}" data-language="ru">RU</button>
+            </div>
+            <a class="button button-primary topbar-button" href="#/wallet">${ui.connectWallet}</a>
+          </div>
         </header>
         <main class="content">${pageContent(page, nftId, state)}</main>
         <footer class="footer">
-          <div>
+          <div class="footer-brand">
+            <span class="footer-brand-mark">
+              <img src="/branding/nexora-logo.png" alt="Nexora logo" />
+            </span>
             <strong>Nexora</strong>
-            <p>Concept frontend for an NFT marketplace focused on premium UX/UI presentation.</p>
+            <p>${ui.footerDescription}</p>
           </div>
           <div class="footer-links">
-            <a href="#/marketplace">Marketplace</a>
-            <a href="#/collections">Collections</a>
-            <a href="#/favorites">Favorites</a>
-            <a href="#/help">FAQ</a>
+            <a href="#/marketplace">${ui.footerLinks.marketplace}</a>
+            <a href="#/collections">${ui.footerLinks.collections}</a>
+            <a href="#/favorites">${ui.footerLinks.favorites}</a>
+            <a href="#/help">${ui.footerLinks.faq}</a>
           </div>
         </footer>
       </div>
@@ -797,9 +840,19 @@ export function createApp(root: HTMLDivElement): void {
         render();
       });
     });
+
+    document.querySelectorAll<HTMLElement>("[data-language]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.language;
+        if (value === "en" || value === "ru") {
+          state.language = value;
+          window.localStorage.setItem(storageKey, value);
+          render();
+        }
+      });
+    });
   };
 
   window.addEventListener("hashchange", render);
-  void walletOptions;
   render();
 }

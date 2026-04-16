@@ -108,6 +108,12 @@ button {
   padding: 28px 0 16px;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -123,15 +129,19 @@ h3 {
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: linear-gradient(145deg, rgba(124, 92, 255, 0.9), rgba(47, 214, 255, 0.48));
-  box-shadow: 0 12px 28px rgba(124, 92, 255, 0.25);
-  font-size: 1.2rem;
-  font-weight: 700;
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 30px rgba(39, 87, 255, 0.14);
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .brand div {
@@ -164,6 +174,35 @@ h3 {
 
 .nav-link:hover,
 .nav-link.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(15, 17, 24, 0.7);
+  backdrop-filter: blur(24px);
+}
+
+.language-button {
+  min-width: 46px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.language-button:hover,
+.language-button.is-active {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
 }
@@ -1020,6 +1059,27 @@ h3 {
   color: var(--muted);
 }
 
+.footer-brand {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-brand-mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(39, 87, 255, 0.12);
+}
+
+.footer-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .footer strong {
   color: var(--text);
 }
@@ -1074,6 +1134,7 @@ h3 {
 
 @media (max-width: 840px) {
   .topbar,
+  .topbar-actions,
   .page-header,
   .cta-panel,
   .profile-hero,
@@ -1091,6 +1152,10 @@ h3 {
 
   .topbar-button {
     width: 100%;
+  }
+
+  .language-switcher {
+    justify-content: center;
   }
 
   .hero-copy,
