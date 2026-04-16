@@ -1,0 +1,17 @@
+{
+  "name": "nexora-marketplace",
+  "version": "1.0.0",
+  "description": "Frontend prototype for a premium Web3 / NFT marketplace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "vite": "^7.0.0"
+  }
+}

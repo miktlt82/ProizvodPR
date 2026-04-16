@@ -1,0 +1,120 @@
+{
+  "project": "Nexora",
+  "description": "Figma-ready design tokens for a premium Web3 / NFT marketplace concept",
+  "colors": {
+    "background/base": "#0A0B10",
+    "background/surface": "#12141B",
+    "background/card": "#171B25",
+    "border/subtle": "rgba(255,255,255,0.08)",
+    "border/strong": "rgba(138,152,183,0.22)",
+    "text/primary": "#F5F7FF",
+    "text/secondary": "#9AA3B2",
+    "accent/primary": "#7C5CFF",
+    "accent/secondary": "#2FD6FF",
+    "accent/tertiary": "#E356B8",
+    "state/success": "#49D08E"
+  },
+  "typography": {
+    "display": {
+      "fontFamily": "Space Grotesk",
+      "fontWeight": 600,
+      "fontSize": 72,
+      "lineHeight": 68,
+      "letterSpacing": "-4%"
+    },
+    "h1": {
+      "fontFamily": "Space Grotesk",
+      "fontWeight": 600,
+      "fontSize": 56,
+      "lineHeight": 54,
+      "letterSpacing": "-4%"
+    },
+    "h2": {
+      "fontFamily": "Space Grotesk",
+      "fontWeight": 500,
+      "fontSize": 40,
+      "lineHeight": 42,
+      "letterSpacing": "-3%"
+    },
+    "h3": {
+      "fontFamily": "Space Grotesk",
+      "fontWeight": 500,
+      "fontSize": 24,
+      "lineHeight": 28,
+      "letterSpacing": "-2%"
+    },
+    "body": {
+      "fontFamily": "Manrope",
+      "fontWeight": 400,
+      "fontSize": 16,
+      "lineHeight": 26
+    },
+    "bodySmall": {
+      "fontFamily": "Manrope",
+      "fontWeight": 500,
+      "fontSize": 14,
+      "lineHeight": 22
+    },
+    "label": {
+      "fontFamily": "Manrope",
+      "fontWeight": 600,
+      "fontSize": 12,
+      "lineHeight": 16,
+      "letterSpacing": "8%"
+    },
+    "data": {
+      "fontFamily": "JetBrains Mono",
+      "fontWeight": 500,
+      "fontSize": 14,
+      "lineHeight": 20
+    }
+  },
+  "spacing": {
+    "4": 4,
+    "8": 8,
+    "12": 12,
+    "14": 14,
+    "16": 16,
+    "18": 18,
+    "20": 20,
+    "22": 22,
+    "24": 24,
+    "28": 28,
+    "30": 30,
+    "34": 34,
+    "44": 44
+  },
+  "radius": {
+    "sm": 14,
+    "md": 18,
+    "lg": 22,
+    "xl": 30,
+    "pill": 999
+  },
+  "effects": {
+    "glassShadow": "0 24px 64px rgba(0,0,0,0.38)",
+    "primaryGlow": "0 18px 34px rgba(124,92,255,0.22)",
+    "panelBlur": 20
+  },
+  "grids": {
+    "desktop": {
+      "width": 1440,
+      "contentWidth": 1320,
+      "columns": 12,
+      "gutter": 24,
+      "margin": 60
+    },
+    "tablet": {
+      "width": 1024,
+      "columns": 8,
+      "gutter": 20,
+      "margin": 32
+    },
+    "mobile": {
+      "width": 390,
+      "columns": 4,
+      "gutter": 12,
+      "margin": 16
+    }
+  }
+}
