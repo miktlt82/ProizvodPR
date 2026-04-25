@@ -605,7 +605,9 @@ function walletPage(language: Language): string {
         .map(
           (wallet) => `
             <article class="wallet-card">
-              <div class="wallet-mark">${wallet.name.slice(0, 1)}</div>
+              <div class="wallet-mark wallet-mark-${wallet.id}">
+                <img src="${wallet.logo}" alt="${wallet.name}" />
+              </div>
               <div>
                 <h3>${wallet.name}</h3>
                 <p>${localize(wallet.label, language)}</p>

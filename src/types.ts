@@ -46,8 +46,10 @@ export type NftItem = {
 };
 
 export type WalletOption = {
+  id: string;
   name: string;
   label: LocalizedText;
+  logo: string;
 };
 
 export type Metric = {

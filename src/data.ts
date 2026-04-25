@@ -225,21 +225,27 @@ export const stats: Metric[] = [
 
 export const walletOptions: WalletOption[] = [
   {
+    id: "metamask",
     name: "MetaMask",
+    logo: "/wallets/metamask.png",
     label: {
       en: "Most used wallet for Ethereum and L2 ecosystems.",
       ru: "Самый распространенный кошелек для Ethereum и L2-экосистем.",
     },
   },
   {
+    id: "walletconnect",
     name: "WalletConnect",
+    logo: "/wallets/walletconnect.png",
     label: {
       en: "Universal connection for mobile and desktop wallets.",
       ru: "Универсальное подключение для мобильных и десктопных кошельков.",
     },
   },
   {
+    id: "coinbase",
     name: "Coinbase Wallet",
+    logo: "/wallets/coinbase-wallet.png",
     label: {
       en: "Simple onboarding for beginners entering Web3.",
       ru: "Простой вход для новичков, которые только заходят в Web3.",
