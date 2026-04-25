@@ -8,6 +8,7 @@ export type Route =
   | "nft"
   | "collections"
   | "profile"
+  | "register"
   | "create"
   | "wallet"
   | "favorites"

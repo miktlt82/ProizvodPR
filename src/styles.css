@@ -244,6 +244,7 @@ h3 {
 }
 
 .hero,
+.register-layout,
 .cta-panel,
 .feature-band,
 .steps-section,
@@ -897,6 +898,119 @@ h3 {
   align-items: start;
 }
 
+.register-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 420px;
+  gap: 22px;
+}
+
+.register-panel,
+.register-info-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(20, 22, 30, 0.92), rgba(12, 14, 20, 0.92));
+  box-shadow: var(--shadow);
+}
+
+.register-panel {
+  padding: 30px;
+}
+
+.register-panel h1 {
+  margin: 10px 0 0;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+}
+
+.register-description,
+.register-note,
+.register-points p,
+.checkbox-field span {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.register-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.text-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  outline: none;
+}
+
+.text-input::placeholder {
+  color: var(--muted);
+}
+
+.text-input:focus {
+  border-color: rgba(47, 214, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(47, 214, 255, 0.08);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  accent-color: var(--accent);
+}
+
+.register-side {
+  display: grid;
+}
+
+.register-info-card {
+  padding: 28px;
+}
+
+.register-points {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.register-points article {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.register-points article span {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: rgba(124, 92, 255, 0.16);
+  color: var(--text);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.register-points article h3 {
+  margin: 0 0 8px;
+}
+
+.register-success {
+  max-width: 760px;
+}
+
 .field-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1104,6 +1218,7 @@ h3 {
 
 @media (max-width: 1180px) {
   .hero,
+  .register-layout,
   .catalog-layout,
   .detail-layout,
   .create-layout {

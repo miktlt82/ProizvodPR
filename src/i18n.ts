@@ -105,6 +105,27 @@ type AppCopy = {
     apr14: string;
     saved: string;
   };
+  register: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    fullName: string;
+    fullNamePlaceholder: string;
+    email: string;
+    emailPlaceholder: string;
+    password: string;
+    passwordPlaceholder: string;
+    repeatPassword: string;
+    repeatPasswordPlaceholder: string;
+    agree: string;
+    submit: string;
+    note: string;
+    highlightsTitle: string;
+    highlights: Array<{ title: string; description: string }>;
+    successTitle: string;
+    successDescription: string;
+    openMarketplace: string;
+  };
   create: {
     eyebrow: string;
     title: string;
@@ -194,6 +215,7 @@ export const copy: Record<Language, AppCopy> = {
       nft: "NFT",
       collections: "Collections",
       profile: "Profile",
+      register: "Register",
       create: "Create",
       wallet: "Wallet",
       favorites: "Favorites",
@@ -216,9 +238,8 @@ export const copy: Record<Language, AppCopy> = {
     toggleFavorite: "Toggle favorite",
     home: {
       chip: "Curated Web3 marketplace",
-      title: "Collect digital assets in a space built to feel premium, clear and alive.",
-      description:
-        "Nexora is a concept NFT marketplace for exploring curated collections, tracking market signals and listing digital art with a wallet-first flow.",
+      title: "Collect digital assets in a premium space.",
+      description: "Explore curated collections, track signals and list digital art in a clean flow.",
       exploreMarketplace: "Explore marketplace",
       featuredDrop: "Featured drop",
       todaySpotlight: "Today spotlight",
@@ -328,6 +349,40 @@ export const copy: Record<Language, AppCopy> = {
       addedToFavorites: "Added Midnight Path to favorites",
       apr14: "Apr 14",
       saved: "Saved",
+    },
+    register: {
+      eyebrow: "Registration",
+      title: "Create your Nexora account",
+      description: "A front-end registration form for quick onboarding into the marketplace.",
+      fullName: "Full name",
+      fullNamePlaceholder: "Enter your name",
+      email: "Email",
+      emailPlaceholder: "Enter your email",
+      password: "Password",
+      passwordPlaceholder: "Create a password",
+      repeatPassword: "Repeat password",
+      repeatPasswordPlaceholder: "Repeat the password",
+      agree: "I agree to the platform rules and privacy policy.",
+      submit: "Create account",
+      note: "No backend is connected: the page only demonstrates the registration UI.",
+      highlightsTitle: "What you get after registration",
+      highlights: [
+        {
+          title: "Favorites and profile",
+          description: "Save assets, keep a personal page and return to selected collections faster.",
+        },
+        {
+          title: "Creator flow",
+          description: "Prepare listings and manage your portfolio from a single interface.",
+        },
+        {
+          title: "Fast start",
+          description: "The form is short and focused on the basic fields needed for entry.",
+        },
+      ],
+      successTitle: "Account created",
+      successDescription: "The form was submitted locally. You can use this state as a ready UI mockup.",
+      openMarketplace: "Open marketplace",
     },
     create: {
       eyebrow: "Create listing",
@@ -464,6 +519,7 @@ export const copy: Record<Language, AppCopy> = {
       nft: "NFT",
       collections: "Коллекции",
       profile: "Профиль",
+      register: "Регистрация",
       create: "Создать",
       wallet: "Кошелек",
       favorites: "Избранное",
@@ -486,9 +542,8 @@ export const copy: Record<Language, AppCopy> = {
     toggleFavorite: "Переключить избранное",
     home: {
       chip: "Кураторский Web3-маркетплейс",
-      title: "Коллекционируйте цифровые активы в пространстве, которое ощущается премиально, ясно и живо.",
-      description:
-        "Nexora — это концепт NFT-маркетплейса для изучения отобранных коллекций, отслеживания рыночных сигналов и публикации цифрового искусства через wallet-first сценарий.",
+      title: "Коллекционируйте цифровые активы в премиальном пространстве.",
+      description: "Изучайте отобранные коллекции, следите за рынком и публикуйте digital art в понятном сценарии.",
       exploreMarketplace: "Открыть маркет",
       featuredDrop: "Главный дроп",
       todaySpotlight: "Выбор дня",
@@ -598,6 +653,40 @@ export const copy: Record<Language, AppCopy> = {
       addedToFavorites: "Midnight Path добавлен в избранное",
       apr14: "14 апр",
       saved: "Сохранено",
+    },
+    register: {
+      eyebrow: "Регистрация",
+      title: "Создайте аккаунт в Nexora",
+      description: "Фронтенд-форма регистрации для быстрого входа в маркетплейс.",
+      fullName: "Имя и фамилия",
+      fullNamePlaceholder: "Введите имя",
+      email: "Эл. почта",
+      emailPlaceholder: "Введите почту",
+      password: "Пароль",
+      passwordPlaceholder: "Придумайте пароль",
+      repeatPassword: "Повторите пароль",
+      repeatPasswordPlaceholder: "Повторите пароль",
+      agree: "Я согласен с правилами платформы и политикой конфиденциальности.",
+      submit: "Создать аккаунт",
+      note: "Бэкенд не подключен: страница показывает только UI регистрации.",
+      highlightsTitle: "Что дает регистрация",
+      highlights: [
+        {
+          title: "Избранное и профиль",
+          description: "Сохраняйте активы, ведите личную страницу и быстрее возвращайтесь к выбранным коллекциям.",
+        },
+        {
+          title: "Creator-flow",
+          description: "Готовьте листинги и управляйте портфелем в одном интерфейсе.",
+        },
+        {
+          title: "Быстрый старт",
+          description: "Форма короткая и включает только базовые поля для входа.",
+        },
+      ],
+      successTitle: "Аккаунт создан",
+      successDescription: "Форма отправлена локально. Это готовый UI-макет состояния после регистрации.",
+      openMarketplace: "Открыть маркет",
     },
     create: {
       eyebrow: "Создание листинга",

@@ -9,6 +9,7 @@ const routeMap: Record<string, Route> = {
   "#/nft": "nft",
   "#/collections": "collections",
   "#/profile": "profile",
+  "#/register": "register",
   "#/create": "create",
   "#/wallet": "wallet",
   "#/favorites": "favorites",
@@ -22,6 +23,14 @@ type AppState = {
   filter: FilterKey;
   favorites: Set<string>;
   language: Language;
+  registrationForm: {
+    fullName: string;
+    email: string;
+    password: string;
+    repeatPassword: string;
+    agree: boolean;
+  };
+  registrationSubmitted: boolean;
 };
 
 function localize(value: LocalizedText, language: Language): string {
@@ -461,6 +470,88 @@ function profilePage(state: AppState): string {
   `;
 }
 
+function registerPage(state: AppState): string {
+  const ui = copy[state.language];
+  const { fullName, email, password, repeatPassword, agree } = state.registrationForm;
+
+  if (state.registrationSubmitted) {
+    return `
+      <section class="register-layout">
+        <article class="register-panel register-success">
+          <span class="section-chip">${ui.register.eyebrow}</span>
+          <h1>${ui.register.successTitle}</h1>
+          <p>${ui.register.successDescription}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#/marketplace">${ui.register.openMarketplace}</a>
+            <a class="button button-secondary" href="#/profile">${ui.nav.profile}</a>
+          </div>
+        </article>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="register-layout">
+      <article class="register-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">${ui.register.eyebrow}</p>
+            <h1>${ui.register.title}</h1>
+          </div>
+        </div>
+        <p class="register-description">${ui.register.description}</p>
+        <form class="register-form" data-register-form>
+          <label class="field">
+            <span>${ui.register.fullName}</span>
+            <input class="text-input" name="fullName" type="text" value="${fullName}" placeholder="${ui.register.fullNamePlaceholder}" />
+          </label>
+          <label class="field">
+            <span>${ui.register.email}</span>
+            <input class="text-input" name="email" type="email" value="${email}" placeholder="${ui.register.emailPlaceholder}" />
+          </label>
+          <label class="field">
+            <span>${ui.register.password}</span>
+            <input class="text-input" name="password" type="password" value="${password}" placeholder="${ui.register.passwordPlaceholder}" />
+          </label>
+          <label class="field">
+            <span>${ui.register.repeatPassword}</span>
+            <input class="text-input" name="repeatPassword" type="password" value="${repeatPassword}" placeholder="${ui.register.repeatPasswordPlaceholder}" />
+          </label>
+          <label class="checkbox-field">
+            <input name="agree" type="checkbox" ${agree ? "checked" : ""} />
+            <span>${ui.register.agree}</span>
+          </label>
+          <div class="detail-actions">
+            <button class="button button-primary" type="submit">${ui.register.submit}</button>
+          </div>
+        </form>
+        <p class="register-note">${ui.register.note}</p>
+      </article>
+
+      <aside class="register-side">
+        <article class="register-info-card">
+          <p class="eyebrow">${ui.register.highlightsTitle}</p>
+          <div class="register-points">
+            ${ui.register.highlights
+              .map(
+                (item, index) => `
+                  <article>
+                    <span>${String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3>${item.title}</h3>
+                      <p>${item.description}</p>
+                    </div>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+        </article>
+      </aside>
+    </section>
+  `;
+}
+
 function createPage(state: AppState): string {
   const ui = copy[state.language];
 
@@ -606,7 +697,6 @@ function designPage(state: AppState): string {
           <h2>${ui.design.kitTitle}</h2>
           <p>${ui.design.kitDescription}</p>
         </div>
-        <img src="/figma/logo-wordmark.svg" alt="${ui.design.wordmarkAlt}" />
       </article>
 
       <article class="design-panel">
@@ -715,7 +805,6 @@ function designPage(state: AppState): string {
         <div class="asset-grid">
           <img src="/figma/logo-mark.svg" alt="${ui.design.logoMarkAlt}" />
           <img src="/figma/hero-art.svg" alt="${ui.design.heroArtAlt}" />
-          <img src="/figma/empty-favorites.svg" alt="${ui.design.emptyStateAlt}" />
         </div>
       </article>
     </section>
@@ -737,6 +826,9 @@ function pageContent(route: Route, nftId: string, state: AppState): string {
   }
   if (route === "profile") {
     return profilePage(state);
+  }
+  if (route === "register") {
+    return registerPage(state);
   }
   if (route === "create") {
     return createPage(state);
@@ -761,6 +853,14 @@ export function createApp(root: HTMLDivElement): void {
     filter: "all",
     favorites: new Set<string>(["nxr-001", "nxr-003"]),
     language: getInitialLanguage(),
+    registrationForm: {
+      fullName: "",
+      email: "",
+      password: "",
+      repeatPassword: "",
+      agree: false,
+    },
+    registrationSubmitted: false,
   };
 
   const render = (): void => {
@@ -784,6 +884,7 @@ export function createApp(root: HTMLDivElement): void {
             ${navLink("marketplace", ui.nav.marketplace)}
             ${navLink("collections", ui.nav.collections)}
             ${navLink("profile", ui.nav.profile)}
+            ${navLink("register", ui.nav.register)}
             ${navLink("create", ui.nav.create)}
             ${navLink("help", ui.nav.help)}
             ${navLink("design", ui.nav.design)}
@@ -793,7 +894,7 @@ export function createApp(root: HTMLDivElement): void {
               <button class="language-button ${state.language === "en" ? "is-active" : ""}" data-language="en">EN</button>
               <button class="language-button ${state.language === "ru" ? "is-active" : ""}" data-language="ru">RU</button>
             </div>
-            <a class="button button-primary topbar-button" href="#/wallet">${ui.connectWallet}</a>
+            <a class="button button-primary topbar-button" href="#/register">${ui.nav.register}</a>
           </div>
         </header>
         <main class="content">${pageContent(page, nftId, state)}</main>
@@ -851,6 +952,25 @@ export function createApp(root: HTMLDivElement): void {
         }
       });
     });
+
+    const registerForm = document.querySelector<HTMLFormElement>("[data-register-form]");
+    if (registerForm) {
+      registerForm.addEventListener("input", (event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.name === "fullName" || target.name === "email" || target.name === "password" || target.name === "repeatPassword") {
+          state.registrationForm[target.name] = target.value;
+        }
+        if (target.name === "agree") {
+          state.registrationForm.agree = target.checked;
+        }
+      });
+
+      registerForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        state.registrationSubmitted = true;
+        render();
+      });
+    }
   };
 
   window.addEventListener("hashchange", render);
