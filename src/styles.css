@@ -1358,3 +1358,265 @@ h3 {
     align-items: stretch;
   }
 }
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+p,
+span,
+strong,
+code,
+a,
+button {
+  overflow-wrap: anywhere;
+}
+
+.brand,
+.brand div,
+.topbar-actions,
+.nav,
+.section-heading,
+.catalog-toolbar,
+.detail-top,
+.profile-hero,
+.footer,
+.card-row,
+.spotlight-footer,
+.collection-stats,
+.table-head,
+.table-row,
+.activity-list article,
+.search-shell,
+.input-shell,
+.price-badge,
+.wallet-card,
+.hero-copy,
+.hero-panel,
+.cta-panel,
+.feature-band,
+.steps-section,
+.sidebar,
+.catalog-main,
+.detail-panel,
+.form-panel,
+.preview-panel,
+.ranking-table,
+.faq-list article,
+.panel-block,
+.page-header,
+.register-panel,
+.register-info-card,
+.design-panel {
+  min-width: 0;
+}
+
+.section-heading > *,
+.card-content > *,
+.collection-body > *,
+.spotlight-content > *,
+.profile-copy > *,
+.footer-brand > * {
+  min-width: 0;
+}
+
+.ranking-table {
+  overflow-x: auto;
+}
+
+.table-head,
+.table-row {
+  min-width: 640px;
+}
+
+@media (max-width: 840px) {
+  .nav {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
+  }
+
+  .button,
+  .button-primary,
+  .button-secondary,
+  .topbar-button {
+    width: 100%;
+  }
+
+  .hero-actions,
+  .detail-actions {
+    width: 100%;
+  }
+
+  .card-row,
+  .spotlight-footer,
+  .collection-stats,
+  .detail-top,
+  .activity-list article,
+  .catalog-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .favorite-button {
+    top: 18px;
+    right: 18px;
+  }
+
+  .hero h1,
+  .page-header h1,
+  .detail-panel h1,
+  .profile-copy h1,
+  .register-panel h1 {
+    line-height: 1;
+  }
+
+  .table-head,
+  .table-row {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar,
+  .content,
+  .footer {
+    width: min(calc(100% - 24px), var(--max-width));
+  }
+
+  .topbar {
+    padding: 18px 0 12px;
+  }
+
+  .content {
+    gap: 22px;
+    padding: 18px 0 32px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brand-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .brand span {
+    font-size: 0.78rem;
+  }
+
+  .nav,
+  .language-switcher {
+    padding: 5px;
+  }
+
+  .nav-link,
+  .language-button {
+    min-height: 36px;
+    padding: 8px 12px;
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .sidebar,
+  .catalog-main,
+  .detail-panel,
+  .form-panel,
+  .preview-panel,
+  .page-header,
+  .panel-block,
+  .steps-section,
+  .register-panel,
+  .register-info-card,
+  .design-panel,
+  .cta-panel {
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .metric-card,
+  .profile-stats article,
+  .feature-band article,
+  .steps-grid article,
+  .wallet-card,
+  .register-points article,
+  .token-card,
+  .type-card,
+  .component-card,
+  .frame-card,
+  .info-tile,
+  .property-card,
+  .faq-list article {
+    padding: 16px;
+  }
+
+  .hero-metrics,
+  .profile-stats {
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .spotlight-visual {
+    margin: 12px;
+  }
+
+  .spotlight-content,
+  .collection-body,
+  .card-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .card-media,
+  .spotlight-visual,
+  .detail-media {
+    border-radius: 18px;
+  }
+
+  .price-badge,
+  .visual-tag,
+  .media-chip,
+  .collection-badge {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .wallet-mark {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+  }
+
+  .register-points article {
+    grid-template-columns: 1fr;
+  }
+
+  .register-points article span {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .table-head,
+  .table-row {
+    min-width: 500px;
+  }
+}
